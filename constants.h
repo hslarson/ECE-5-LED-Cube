@@ -2,108 +2,7 @@
 #define constants
 
 
-/*
-  How to set PIN_CONFIGURATION
-
-  Shift Register 1:   Shift Register 2:
-    Q0: 0               Q0: 8
-    Q1: 1               Q1: 9
-    Q2: 2               Q2: 10
-    Q3: 3               Q3: 11
-    Q4: 4               Q4: 12
-    Q5: 5               Q5: 13
-    Q6: 6               Q6: 14
-    Q7: 7               Q7: 15
-
-  Using the values above, assign integer values to the 2d matrix below
-  to denote which pin of the shift registers each column is connected to
-
-  Note:
-    The front of the cube is towards the top of the page
-    You are looking at the cube from the top down
-*/
-int PIN_CONFIGURATION[] = {
-  //    ^
-  //  Front
-  {0,  1,  2,  3 },
-  {4,  5,  6,  7 },
-  {8,  9,  10, 11},
-  {12, 13, 14, 15}
-};
-
-
-/*
-  How to set FREQ_PLACEMENT
-
-  Frequency Placement (FREQ_PLACEMENT) describes 
-  which column of the cube displays each frequency band
-
-  Frequency Range(Hz):
-    63-1059:     0
-    1060-2055:   1
-    2056-3051:   2
-    3052-4047:   3
-    4048-5043:   4
-    5044-6039:   5
-    6040-7035:   6
-    7036-8031:   7
-    8032-9027:   8
-    9028-10023:  9
-    10024-11019: 10
-    11020-12015: 11
-    12016-13011: 12
-    13012-14007: 13
-    14008-15003: 14
-    15004-16000: 15
-
-  Fill out the grid similarly to the pin_configuration array (see instructions above)
-*/
-int FREQ_PLACEMENT[] = {
-  //    ^
-  //  Front
-  {0,  1,  2,  3 },
-  {4,  5,  6,  7 },
-  {8,  9,  10, 11},
-  {12, 13, 14, 15}
-};
-
-
-/*
-  How to set FREQ_THRESHOLDS
-
-  This array sets the MAXIMUM magnitude for each layer of led's
-  The index of the array represents the number of LED's shown in each column
-
-  Note:
-    The first element (index 0) is the magnitude below which no LED's will show
-    You don't need to set the maximum magnitude for the 4th led because it's a catch-all
-*/
-int FREQ_THRESHOLDS[] = {500, 1000, 1500, 2000};  // I don't actually know what the output of getSpectrum looks like so these could be way off
-
-
-// The amount by which the raw volume reading needs to change in order to display the volume
-int VOLUME_CHANGE_THRESHOLD = 64; // Note: set min max and base thresh off this
-
-
-//The length of time (in miliseconds) the the volume will stay on the cube after no changes are detected
-int VOLUME_LINGERING_TIME = 2000;
-
-
-// The number of times to refresh the cube per second
-int FRAME_RATE = 60;
-
-
-// 
-double LAYER_SHOW_TIME = 1 / FRAME_RATE / 6;
-
-// Divide the raw volume reading by this number to get the number of LED's to light up
-double VOLUME_NORMALIZING_FACTOR = 1023 / 16;
-
-
-// 
-
-
-// **Declare Pin Constants**
+/*** PIN CONSTANTS ***/
 // Transistor Pins
 const int Layer1 = 13,
           Layer2 = 12,
@@ -124,6 +23,93 @@ const int AnalyserData   = 14, //A0
 
 // Volume Knob Pin
 const int VolumePin = 15; //A1
+
+
+/*** DISPLAY CONSTANTS ***/
+/*
+  How to set PIN_CONFIGURATION
+
+  Transistor Array 1:  Transistor Array 2:  Transistor Array 3:
+  Pin 16: 1            Pin 16: 7            Pin 16: 13
+  Pin 15: 2            Pin 15: 8            Pin 15: 14
+  Pin 14: 3            Pin 14: 9            Pin 14: 15
+  Pin 13: 4            Pin 13: 10           Pin 13: 16
+  Pin 12: 5            Pin 12: 11           Pin 12: 17
+  Pin 11: 6            Pin 11: 12           Pin 11: 18
+
+  Transistor Array 4:  Transistor Array 5:  Transistor Array 6:
+  Pin 16: 19           Pin 16: 25           Pin 16: 31
+  Pin 15: 20           Pin 15: 26           Pin 15: 32
+  Pin 14: 21           Pin 14: 27           Pin 14: 33
+  Pin 13: 22           Pin 13: 28           Pin 13: 34
+  Pin 12: 23           Pin 12: 29           Pin 12: 35  
+  Pin 11: 24           Pin 11: 30           Pin 11: 36
+
+  Using the values above, assign integer values to the 2d matrix below
+  to denote which pin of the shift registers each column is connected to
+
+  Note:
+    The front of the cube is towards the top of the page
+    You are looking at the cube from the top down
+*/
+const int PIN_CONFIGURATION[][6] = {
+  //          ^
+  //        Front
+  {1,  2,  3,  4,  5,  6 },
+  {7,  8,  9,  10, 11, 12},
+  {13, 14, 15, 16, 17, 18},
+  {19, 20, 21, 22, 23, 24},
+  {25, 26, 27, 28, 29, 30},
+  {31, 32, 33, 34, 35, 36}
+};
+
+// The number of times to refresh the cube per second
+const int FRAME_RATE = 60;
+
+// The number of seconds each layer is shown
+const double LAYER_SHOW_TIME = 1 / FRAME_RATE / 6;
+
+
+/*** AUDIO ANALYSER CONSTANTS ***/
+/*
+  How to set FREQ_PLACEMENT
+
+  This array describes which frequency maps to each column
+
+  The range of frequencies spans from 63HZ (Number 1) to 16KHZ (Number 36).
+  Fill out the grid similarly to the pin_configuration array (see instructions above).
+*/
+const int FREQ_PLACEMENT[][6] = {
+  //          ^
+  //        Front
+  {1,  2,  3,  4,  5,  6 },
+  {7,  8,  9,  10, 11, 12},
+  {13, 14, 15, 16, 17, 18},
+  {19, 20, 21, 22, 23, 24},
+  {25, 26, 27, 28, 29, 30},
+  {31, 32, 33, 34, 35, 36}
+};
+
+// This array sets the MINIMUM magnitude (0 - 1023) to light a particular layer of led's
+const int FREQ_THRESHOLDS[] = {146, 292, 438, 584, 730, 876};
+
+// Number of new channels we need to create between each real channel
+// Always evaluates to 5 but this helps demonstrate where it comes from
+const int NUM_FILLER_CHANNELS = round((float)(36 - 7) / (7 - 1));
+
+
+/*** VOLUME CONSTANTS ***/
+// The amount by which the raw volume reading needs to change in order to display the volume (on a scale from 1 - 36)
+const int VOLUME_CHANGE_THRESHOLD = 2;
+
+// The analog reading when the knob is at it's lowest point
+const int VOLUME_MIN_READING = 456; // <--- Not right, I forgot what I tested it to be
+
+// The amount by which the raw volume reading must change to register as a different reading (1-36)
+const double VOLUME_INCREMENT_AMOUNT = (double)(1024 - VOLUME_MIN_READING) / 36;
+
+//The length of time (in miliseconds) the the volume will stay on the cube after no changes are detected
+const int VOLUME_LINGERING_TIME = 2000;
 
 
 #endif

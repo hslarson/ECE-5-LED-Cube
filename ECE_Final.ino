@@ -49,10 +49,10 @@ void loop() {
 
   //Check if the Volume Knob has Changed
   while ( abs(LastVolume - getVolume()) > VOLUME_CHANGE_THRESHOLD || 
-          milis() < LastChange + VOLUME_LINGERING_TIME) {
+          millis() < LastChange + VOLUME_LINGERING_TIME) {
     
     LastVolume = getVolume();
-    LastChange = milis();
+    LastChange = millis();
 
     bool VolumeMatrix[6][6][6] = {0};
     makeVolumeMatrix(VolumeMatrix, LastVolume);
