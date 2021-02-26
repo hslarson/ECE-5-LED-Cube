@@ -4,22 +4,21 @@
 
 /*** PIN CONSTANTS ***/
 // Transistor Pins
-const int Layer1 = 13,
-          Layer2 = 12,
-          Layer3 = 11,
-          Layer4 = 10,
-          Layer5 = 9,
-          Layer6 = 8;
+const int Layer1 = 2,
+          Layer2 = 3,
+          Layer3 = 4,
+          Layer4 = 5,
+          Layer5 = 6,
+          Layer6 = 7;
 
 // Shift Register Pins
-const int ShiftDataPin  = 7,
-          ShiftLatchPin = 6,
-          ShiftClockPin = 5;
+// (Since we're using the SPI bus, MOSI(Pin 11) and SCK(Pin 13) correspond to data and clock,  respectively)
+const int ShiftLatchPin = 10;
 
 // MSGEQ7 Pins
 const int AnalyserData   = 14, //A0
-          AnalyserReset  = 4,
-          AnalyserStrobe = 3;
+          AnalyserReset  = 8,
+          AnalyserStrobe = 9;
 
 // Volume Knob Pin
 const int VolumePin = 15; //A1
@@ -30,23 +29,25 @@ const int VolumePin = 15; //A1
   How to set PIN_CONFIGURATION
 
   Transistor Array 1:  Transistor Array 2:  Transistor Array 3:
-  Pin 16: 1            Pin 16: 7            Pin 16: 13
-  Pin 15: 2            Pin 15: 8            Pin 15: 14
-  Pin 14: 3            Pin 14: 9            Pin 14: 15
-  Pin 13: 4            Pin 13: 10           Pin 13: 16
-  Pin 12: 5            Pin 12: 11           Pin 12: 17
-  Pin 11: 6            Pin 11: 12           Pin 11: 18
+  Out 1: 1             Out 1: 7             Out 1: 13
+  Out 2: 2             Out 2: 8             Out 2: 14
+  Out 3: 3             Out 3: 9             Out 3: 15
+  Out 4: 4             Out 4: 10            Out 4: 16
+  Out 5: 5             Out 5: 11            Out 5: 17
+  Out 6: 6             Out 6: 12            Out 6: 18
 
   Transistor Array 4:  Transistor Array 5:  Transistor Array 6:
-  Pin 16: 19           Pin 16: 25           Pin 16: 31
-  Pin 15: 20           Pin 15: 26           Pin 15: 32
-  Pin 14: 21           Pin 14: 27           Pin 14: 33
-  Pin 13: 22           Pin 13: 28           Pin 13: 34
-  Pin 12: 23           Pin 12: 29           Pin 12: 35  
-  Pin 11: 24           Pin 11: 30           Pin 11: 36
+  Out 1: 19            Out 1: 25            Out 1: 31
+  Out 2: 20            Out 2: 26            Out 2: 32
+  Out 3: 21            Out 3: 27            Out 3: 33
+  Out 4: 22            Out 4: 28            Out 4: 34
+  Out 5: 23            Out 5: 29            Out 5: 35  
+  Out 6: 24            Out 6: 30            Out 6: 36
 
   Using the values above, assign integer values to the 2d matrix below
-  to denote which pin of the shift registers each column is connected to
+  to denote which output of the shift registers each column is connected to
+
+  The specific pin each "Out" corresponds to is set in SHIFT_REGISTER_CONFIG, here we just care about order
 
   Note:
     The front of the cube is towards the top of the page
@@ -63,11 +64,20 @@ const int PIN_CONFIGURATION[][6] = {
   {31, 32, 33, 34, 35, 36}
 };
 
+// Describes which pins of the shift registers are connected (1 = Connected, 0 = Not Connected)
+// To simplify things, the program assumes that each register has the same number of connections (6 each for 6x6x6)
+// and that the connections are the same for each register
+const bool SHIFT_REGISTER_CONFIG[] = {0, 1, 1, 1, 1, 1, 1, 0};
+//                                   Q0 Q1 Q2 Q3 Q4 Q5 Q6 Q7
+
+// Organizes the layer pins so they can be used easily
+const int LAYER_PINS[] = {Layer1, Layer2, Layer3, Layer4, Layer5, Layer6};
+
 // The number of times to refresh the cube per second
 const int FRAME_RATE = 60;
 
-// The number of seconds each layer is shown
-const double LAYER_SHOW_TIME = 1 / FRAME_RATE / 6;
+// The number of microseconds each layer is shown
+const double LAYER_SHOW_TIME = 1000000 / FRAME_RATE / 6;
 
 
 /*** AUDIO ANALYSER CONSTANTS ***/

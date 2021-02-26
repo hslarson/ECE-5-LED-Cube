@@ -1,63 +1,88 @@
-#include "functions.h"
-#include "constants.h"
 #include <math.h>
+#include <SPI.h>
 
-// Declare Volume Variables
-int LastVolume, LastChange;
+#include "constants.h"
+#include "multiplexer.h"
+#include "msgeq7.h"
+#include "volume.h"
 
+// Create Class Objects
+Multiplexer   cube;
+MSGEQ7        analyser;
+VolumeControl volume;
+
+// Declare Timing Variable
+unsigned long int StartTime = micros();
+
+// Declare a function to handle subtasks
+bool subtasks(bool);
 
 void setup() {
-  // **Set PinModes**
-  // Transistor Pins
-  pinMode(Layer1, OUTPUT);
-  pinMode(Layer2, OUTPUT);
-  pinMode(Layer3, OUTPUT);
-  pinMode(Layer4, OUTPUT);
-  pinMode(Layer5, OUTPUT);
-  pinMode(Layer6, OUTPUT);
+    // **Set PinModes**
+    // Transistor Pins
+    pinMode(Layer1, OUTPUT);
+    pinMode(Layer2, OUTPUT);
+    pinMode(Layer3, OUTPUT);
+    pinMode(Layer4, OUTPUT);
+    pinMode(Layer5, OUTPUT);
+    pinMode(Layer6, OUTPUT);
 
-  // Shift Register Pins
-  pinMode(ShiftDataPin,  OUTPUT);
-  pinMode(ShiftLatchPin, OUTPUT);
-  pinMode(ShiftClockPin, OUTPUT);
+    // Shift Register Pins
+    pinMode(ShiftLatchPin, OUTPUT);
 
-  // MSGEQ7 Pins
-  pinMode(AnalyserReset,  OUTPUT);
-  pinMode(AnalyserStrobe, OUTPUT);
+    // MSGEQ7 Pins
+    pinMode(AnalyserReset,  OUTPUT);
+    pinMode(AnalyserStrobe, OUTPUT);
 
-  // **Initialize the Volume Variables**
-  LastVolume = getVolume();
-  LastChange = -1 * VOLUME_LINGERING_TIME - 1;
+    // **Initialize the SPI Bus**
+    SPI.begin();
+    SPI.beginTransaction(SPISettings(8000000 /* 8MHZ */, LSBFIRST, SPI_MODE0));
 }
 
 
 void loop() {
-  //Record the Time at Which We Start the Loop
-  unsigned long int StartTime = micros();
+    // Reset State Variables
+    bool finished_drawing_cube = 0,
+         finished_subtasks = 0;
 
-  //Read Data From the MSGEQ7 Circuit
-  int TempSpectrum[7] = {0},
-      OutSpectrum[36] = {0};
-  getSpectrum(TempSpectrum);
-  normSpectrum(TempSpectrum, OutSpectrum);
+    // Reset the subtask handler
+    subtasks(true);
 
-  // Build the Matrix and Send it to the Cube
-  bool OutMatrix[6][6][6] = {0};
-  makeSpectrumMatrix(OutMatrix, OutSpectrum);
-  showMatrix(OutMatrix, StartTime);
+    while (!finished_drawing_cube) {
+        if ((int)abs(micros() - StartTime) / (int)LAYER_SHOW_TIME) {
+            if (cube.nextLayer())
+                finished_drawing_cube = true;
+        }
+        else if (!finished_subtasks && subtasks(false)) {
+            finished_subtasks = true;
+        }
+    }
+}
 
+bool subtasks (bool reset) {
+    static int task = 0;
 
-  //Check if the Volume Knob has Changed
-  while ( abs(LastVolume - getVolume()) > VOLUME_CHANGE_THRESHOLD || 
-          millis() < LastChange + VOLUME_LINGERING_TIME) {
-    
-    LastVolume = getVolume();
-    LastChange = millis();
+    if (reset) {
+        task = 0;
+        return false;
+    }
 
-    bool VolumeMatrix[6][6][6] = {0};
-    makeVolumeMatrix(VolumeMatrix, LastVolume);
-    showMatrix(VolumeMatrix, StartTime);
+    switch (task) {
+    case 0:
+        analyser.getSpectrum();
+        break;
+    case 1:
+        analyser.makeSpectrumMatrix();
+        break;
+    case 2:
+        if (volume.checkVolume())
+            volume.showVolume(cube);
+        break;
 
-    StartTime = micros();
-  }
+    default:
+        return true;
+    };
+
+    task++;
+    return false;
 }
