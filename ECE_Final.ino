@@ -20,12 +20,9 @@ bool subtasks(bool);
 void setup() {
     // **Set PinModes**
     // Transistor Pins
-    pinMode(Layer1, OUTPUT);
-    pinMode(Layer2, OUTPUT);
-    pinMode(Layer3, OUTPUT);
-    pinMode(Layer4, OUTPUT);
-    pinMode(Layer5, OUTPUT);
-    pinMode(Layer6, OUTPUT);
+    for (int layer = 0; layer < 6; layer++) {
+        pinMode(LAYER_PINS[layer], OUTPUT);
+    }
 
     // Shift Register Pins
     pinMode(ShiftLatchPin, OUTPUT);
@@ -48,13 +45,21 @@ void loop() {
     // Reset the subtask handler
     subtasks(true);
 
-    while (!finished_drawing_cube) {
-        if ((int)abs(micros() - StartTime) / (int)LAYER_SHOW_TIME) {
+    while (!finished_drawing_cube || !finished_subtasks) {
+		// If the subtasks haven't been completed, do one
+		if (!finished_subtasks) {
+			if (subtasks(false))
+				finished_subtasks = true;
+
+			// If we're waiting on the subtasks to start a new iteration, don't bother checking the timer for the layers
+			if (finished_drawing_cube)
+				continue;
+			
+		}
+		// Try to show the layers on a preset interval
+        else if ((int)abs(micros() - StartTime) / (int)LAYER_SHOW_TIME) {
             if (cube.nextLayer())
                 finished_drawing_cube = true;
-        }
-        else if (!finished_subtasks && subtasks(false)) {
-            finished_subtasks = true;
         }
     }
 }
@@ -69,16 +74,21 @@ bool subtasks (bool reset) {
 
     switch (task) {
     case 0:
-        analyser.getSpectrum();
-        break;
-    case 1:
-        analyser.makeSpectrumMatrix();
-        break;
-    case 2:
+		// Handle any changes in the volume knob
         if (volume.checkVolume())
             volume.showVolume(cube);
         break;
+    case 1:
+		// Read data from the MSGEQ7 circuit
+        analyser.getSpectrum();
+        break;
+    case 2:
+		// Output the spectrum data to the cube
+        analyser.makeSpectrumMatrix();
+        analyser.queueMatrix(cube);
+        break;
 
+	// Return true if all tasks have been completed
     default:
         return true;
     };
