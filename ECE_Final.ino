@@ -15,7 +15,8 @@ VolumeControl volume;
 unsigned long int StartTime = micros();
 
 // Declare a function to handle subtasks
-bool subtasks(bool);
+void subtasks(bool);
+
 
 void setup() {
     // **Set PinModes**
@@ -40,59 +41,73 @@ void setup() {
 void loop() {
     // Reset State Variables
     bool finished_drawing_cube = 0,
-         finished_subtasks = 0;
+         finished_subtask = 0;
 
     // Reset the subtask handler
     subtasks(true);
 
-    while (!finished_drawing_cube || !finished_subtasks) {
-		// If the subtasks haven't been completed, do one
-		if (!finished_subtasks) {
-			if (subtasks(false))
-				finished_subtasks = true;
-
-			// If we're waiting on the subtasks to start a new iteration, don't bother checking the timer for the layers
-			if (finished_drawing_cube)
-				continue;
-			
+    while (!finished_drawing_cube) {
+        // Do one subtask before drawing each layer
+		if (!finished_subtask) {
+			subtasks();
+            finished_subtask = true;
 		}
-		// Try to show the layers on a preset interval
+
+		// Attempt to show the layers on a preset interval
         else if ((int)abs(micros() - StartTime) / (int)LAYER_SHOW_TIME) {
+            StartTime = micros();
+
             if (cube.nextLayer())
                 finished_drawing_cube = true;
         }
     }
 }
 
-bool subtasks (bool reset) {
+
+void subtasks (bool reset = false) {
     static int task = 0;
+    static bool mode = MODE_SPECTRUM;
 
     if (reset) {
         task = 0;
-        return false;
+        return;
     }
 
     switch (task) {
-    case 0:
-		// Handle any changes in the volume knob
-        if (volume.checkVolume())
-            volume.showVolume(cube);
-        break;
-    case 1:
-		// Read data from the MSGEQ7 circuit
-        analyser.getSpectrum();
-        break;
-    case 2:
-		// Output the spectrum data to the cube
-        analyser.makeSpectrumMatrix();
-        analyser.queueMatrix(cube);
-        break;
 
-	// Return true if all tasks have been completed
-    default:
-        return true;
+    // Check the state of the volume know
+    case 0:
+		// Switch into volume mode if there have been changes in the volume knob
+        if (volume.checkVolume())
+            mode = MODE_VOLUME;
+        else
+            mode = MODE_SPECTRUM;
+        break;
+    
+    // Collect data (if necessary)
+    case 1:
+        // Read data from the MSGEQ7 circuit
+        if (mode == MODE_SPECTRUM)
+            analyser.getSpectrum();
+        break;
+    
+    // Construct the matrix
+    case 2:
+        if (mode == MODE_SPECTRUM)
+            analyser.makeSpectrumMatrix(); 
+        else
+            volume.makeVolumeMatrix();
+        break;
+    
+    // Queue the matrix to be shown
+    case 3:
+        if (mode == MODE_SPECTRUM)
+            analyser.queueMatrix(cube);
+        else
+            volume.queueMatrix(cube);
+        break;
     };
 
     task++;
-    return false;
+    return;
 }

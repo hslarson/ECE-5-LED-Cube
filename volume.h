@@ -1,11 +1,12 @@
 class VolumeControl {
 public:
     bool checkVolume();
-    void showVolume(Multiplexer);
+    void makeVolumeMatrix();
+    void queueMatrix(Multiplexer);
+
 private:
     int getVolume();
-    void makeVolumeMatrix();
-
+    
     int LastVolume = 0, LastChange = millis();
     bool volumeMatrix[6][6][6] = {0};
 };
@@ -29,5 +30,10 @@ int VolumeControl::getVolume() {
 
 void VolumeControl::makeVolumeMatrix() {
 
+    return;
+}
+
+void VolumeControl::queueMatrix(Multiplexer output) {
+    output.setMatrix(volumeMatrix);
     return;
 }

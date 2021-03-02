@@ -29,25 +29,27 @@ const int VolumePin = 15; //A1
   How to set PIN_CONFIGURATION
 
   Transistor Array 1:  Transistor Array 2:  Transistor Array 3:
-  Out 1: 1             Out 1: 7             Out 1: 13
-  Out 2: 2             Out 2: 8             Out 2: 14
-  Out 3: 3             Out 3: 9             Out 3: 15
-  Out 4: 4             Out 4: 10            Out 4: 16
-  Out 5: 5             Out 5: 11            Out 5: 17
-  Out 6: 6             Out 6: 12            Out 6: 18
+  Q0: 1                Q0: 9                Q0: 17             
+  Q1: 2                Q1: 10               Q1: 18             
+  Q2: 3                Q2: 11               Q2: 19             
+  Q3: 4                Q3: 12               Q3: 20             
+  Q4: 5                Q4: 13               Q4: 21             
+  Q5: 6                Q5: 14               Q5: 22             
+  Q6: 7                Q6: 15               Q6: 23             
+  Q7: 8                Q7: 16               Q7: 24             
 
   Transistor Array 4:  Transistor Array 5:  Transistor Array 6:
-  Out 1: 19            Out 1: 25            Out 1: 31
-  Out 2: 20            Out 2: 26            Out 2: 32
-  Out 3: 21            Out 3: 27            Out 3: 33
-  Out 4: 22            Out 4: 28            Out 4: 34
-  Out 5: 23            Out 5: 29            Out 5: 35  
-  Out 6: 24            Out 6: 30            Out 6: 36
+  Q0: 25               Q0: 33               Q0: 41             
+  Q1: 26               Q1: 34               Q1: 42             
+  Q2: 27               Q2: 35               Q2: 43             
+  Q3: 28               Q3: 36               Q3: 44             
+  Q4: 29               Q4: 37               Q4: 45             
+  Q5: 30               Q5: 38               Q5: 46             
+  Q6: 31               Q6: 39               Q6: 47             
+  Q7: 32               Q7: 40               Q7: 48             
 
   Using the values above, assign integer values to the 2d matrix below
-  to denote which output of the shift registers each column is connected to
-
-  The specific pin each "Out" corresponds to is set in SHIFT_REGISTER_CONFIG, here we just care about order
+  to denote which output pin of the shift registers each column is connected to
 
   Note:
     The front of the cube is towards the top of the page
@@ -64,14 +66,13 @@ const int PIN_CONFIGURATION[][6] = {
   {31, 32, 33, 34, 35, 36}
 };
 
-// Describes which pins of the shift registers are connected (1 = Connected, 0 = Not Connected)
-// To simplify things, the program assumes that each register has the same number of connections (6 each for 6x6x6)
-// and that the connections are the same for each register
-const bool SHIFT_REGISTER_CONFIG[] = {0, 1, 1, 1, 1, 1, 1, 0};
-//                                   Q0 Q1 Q2 Q3 Q4 Q5 Q6 Q7
 
-// Organizes the layer pins so they can be used easily
+// Organizes the layer pins so they can be iterated through more easily
 const int LAYER_PINS[] = {Layer1, Layer2, Layer3, Layer4, Layer5, Layer6};
+
+// Display modes
+const bool MODE_SPECTRUM = true;
+const bool MODE_VOLUME   = false;
 
 // The number of times to refresh the cube per second
 const int FRAME_RATE = 60;
@@ -87,7 +88,8 @@ const double LAYER_SHOW_TIME = 1000000 / FRAME_RATE / 6;
   This array describes which frequency maps to each column
 
   The range of frequencies spans from 63HZ (Number 1) to 16KHZ (Number 36).
-  Fill out the grid similarly to the pin_configuration array (see instructions above).
+  Fill out the grid similarly to the pin_configuration array (see instructions above),
+  Be sure to use only numbers 1-36 since these correspond to columns, not shift register pins
 */
 const int FREQ_PLACEMENT[][6] = {
   //          ^

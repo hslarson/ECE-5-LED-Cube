@@ -12,6 +12,7 @@ private:
 };
 
 void MSGEQ7::getSpectrum() {
+    // For debuging only
     int temp[] = {0, 100, 200, 300, 400, 500, 600};
     for (int i = 0; i < 7; i++) {
         rawReadings[i] = temp[i];

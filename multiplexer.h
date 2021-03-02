@@ -8,32 +8,28 @@ private:
     bool newMatrix[6][6][6] = {0};
     int  currentLayer = 0, lastLayer = 0;
 
-    bool data[48] = {0};
     int  outputData[6] = {0};
-    void constructData(int layer);
+    void constructData(int);
     void sendData();
-    void bin2int();
 };
 
 void Multiplexer::setMatrix(const bool inMatrix[][6][6], bool mode = 0) {
-    for (int l = 0; l < 6; l++) {
-        for (int r = 0; r < 6; r++) {
-            for (int c = 0; c < 6; c++) {
-                // Mode 0 takes a brand new matrix and queues it to be shown
-                if (!mode)
-                    newMatrix[l][r][c] = inMatrix[l][r][c];
-                // Mode 1 sets the display matrix to some new matrix (presumably newMatrix)
-                else
-                    matrix[l][r][c] = inMatrix[l][r][c];
-            }
-        }
+    // Mode 0 takes a brand new matrix and queues it to be shown
+    if (!mode) {
+        memcpy(&newMatrix[0][0][0], &inMatrix[0][0][0], (6*6*6)*sizeof(bool));
     }
+
+    // Mode 1 sets the display matrix to some new matrix (presumably newMatrix)
+    else {
+        memcpy(&matrix[0][0][0], &inMatrix[0][0][0], (6*6*6)*sizeof(bool));
+    }
+    
+    return;
 }
 
 bool Multiplexer::nextLayer() {
     // Build the data array for the current layer
     constructData(currentLayer);
-    bin2int();
 
     // Send the data to the shift registers and turn on the current layer
     sendData();
@@ -52,29 +48,15 @@ bool Multiplexer::nextLayer() {
 }
 
 void Multiplexer::constructData(int layer) {
-    // Save the 36 bits of real data to a temporary array based on the pin configuration setting
-    bool temp_data[36] = {0};
+    // Place the bits of data into the data array based on the pin configuration setting
+    bool data[48] = {0};
     for (int r = 0; r < 6; r++) {
         for (int c = 0; c < 6; c++) {
-            temp_data[PIN_CONFIGURATION[r][c] - 1] = matrix[layer][r][c];
+            data[PIN_CONFIGURATION[r][c] - 1] = matrix[layer][r][c];
         }
     }
 
-    // Create a 48 bit array from the 36 bit array based on shift register config
-    int temp_arr_pos = 0, out_arr_pos = 0;
-    for (int sr = 0; sr < 6; sr++) {
-        for (int bit = 0; bit < 8; bit++) {
-            if (SHIFT_REGISTER_CONFIG[bit]) {
-                data[out_arr_pos + bit] = temp_data[temp_arr_pos];
-                temp_arr_pos++;
-            }
-        }
-        out_arr_pos += 8;
-    }
-    return;
-}
-
-void Multiplexer::bin2int() {
+    // Convert the binary array we just created into an array of integers
     for (int sr = 0, arr_pos = 0; sr < 6; sr++) {
         // For each byte int the private data array, convert it to an int and save it to the output array
         int out_num = 0;
@@ -84,6 +66,7 @@ void Multiplexer::bin2int() {
         }
         outputData[sr] = out_num;
     }
+    return;
 }
 
 void Multiplexer::sendData() {
@@ -91,7 +74,7 @@ void Multiplexer::sendData() {
     /*
     // Send the the data to the shift registers
     digitalWrite(ShiftLatchPin, LOW);
-    for (int i = 0; i < 6; i++) {
+    for (int i = 6; i > 0; i--) {
         SPI.transfer(formatted_data[i]);
     }
     // Update the layer transistors and display the output of the shift registers
