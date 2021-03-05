@@ -5,6 +5,7 @@ public:
     void queueMatrix(Multiplexer);
 private:
     void normSpectrum();
+    int  averageReading = -1;
 
     int rawReadings[7] = {0};
     int normedReadings[36] = {0};
@@ -12,31 +13,95 @@ private:
 };
 
 void MSGEQ7::getSpectrum() {
-    // For debuging only
-    int temp[] = {0, 100, 200, 300, 400, 500, 600};
-    for (int i = 0; i < 7; i++) {
-        rawReadings[i] = temp[i];
+    int tempReadings[7] = {0};
+
+    // Reset the Chip
+    digitalWrite(AnalyserReset, HIGH);
+    delayMicroseconds(100);
+    digitalWrite(AnalyserReset, LOW);
+    
+    // Read Data from the Chip
+    for (int x = 0; x < 7; x++){
+        digitalWrite(AnalyserStrobe, LOW);
+        
+        // Allow the Output to Settle
+        delayMicroseconds(35);
+        
+        // Save reading
+        tempReadings[x] = analogRead(AnalyserData);
+        
+        digitalWrite(AnalyserStrobe, HIGH);
+        
+        // Wait Before Strobing Again (unless this is the last reading)
+        if (x < 6)
+          delayMicroseconds(100);
     }
+    
+    // Apply the rolling average filter to the data we colloected
+    for (int i = 0; i < 7; i++) {
+        rawReadings[i] = round((double)(FREQ_AVERAGING_POINTS - 1) / FREQ_AVERAGING_POINTS * rawReadings[i]
+                             + (1.0 / FREQ_AVERAGING_POINTS) * tempReadings[i]);
+    }
+
+    if (DEBUG) {
+      for (int temp : tempReadings) {
+        Serial.print(temp);
+        Serial.print(' ');
+      } Serial.println("");
+      
+      for (int raw : rawReadings) {
+        Serial.print(raw);
+        Serial.print(' ');
+      } Serial.println("\n");
+    }
+
+    // Calculate the average of the readings we just found
+    int sum = 0;
+    for (int num : rawReadings) {
+        sum += num;
+    }
+    averageReading = round((double)sum / 7);
+
     return;
 }
 
 void MSGEQ7::normSpectrum() {
-    normedReadings[0] = rawReadings[0];
-
-    for (int arr_index = 1, segment = 5, data_index = 0; arr_index < 36; arr_index++) {
-        // If we've calculated all of the filler channels between two channels, reset and move to the next two channels
-        if (segment == 0) {
-            segment = NUM_FILLER_CHANNELS;
-            normedReadings[arr_index] = rawReadings[data_index + 1];
-            data_index++;
-        }
-        // Otherwise, calculate the filler channel
-        else {
-            normedReadings[arr_index] = round(((float)segment / (7 - 1))*rawReadings[data_index] +
-                                              (1.0 - (float)segment / (7 - 1))*rawReadings[data_index + 1]);
-            segment--;
-        }
+    // Distribute the raw readings into the normed array
+    for (int i = 0; i < 7; i++) {
+        normedReadings[PRIMARY_FREQ_LOCATIONS[i]] = rawReadings[i];
     }
+
+    int data_pos = 0;
+    int left_index, right_index;
+    int left_data, right_data;
+    while (data_pos < 6) {
+        // Set the left and right indicies and get the array values 
+        left_index  = PRIMARY_FREQ_LOCATIONS_ASCENDING[data_pos];
+        right_index = PRIMARY_FREQ_LOCATIONS_ASCENDING[data_pos + 1];
+
+        left_data  = normedReadings[left_index];
+        right_data = normedReadings[right_index];
+
+        // Create a function in the form y=mx+b that inperpolates the data between the left and right indices
+        double m = (double)(right_data - left_data) / (right_index - left_index);
+        double b = (-m * left_index) + left_data;
+
+        // Perform the interpolation
+        for (int x = left_index + 1; x < right_index; x++) {
+            normedReadings[x] = round( m*x+b );
+        }
+
+        // Move to the next set of points
+        data_pos++;
+    }
+
+    if (DEBUG) {
+      for (int freq : normedReadings) {
+        Serial.print(freq);
+        Serial.print(" ");
+      } Serial.println("\n");
+    }
+    
     return;
 }
 
@@ -44,31 +109,47 @@ void MSGEQ7::makeSpectrumMatrix() {
     // We must normalize the raw readings before making the spectrum matrix
     normSpectrum();
 
-    for (int i = 0; i < 36; i++) {
-        // Find the mathing index in the freq placement array
-        int row, col;
-        bool break_all(false);
-        for (row = 0; !break_all && row < 6; row++) {
-            for (col = 0; !break_all && col < 6; col++) {
-                if (FREQ_PLACEMENT[row][col] == i + 1) {
-                    break_all = true;
-                    row--;
-                    col--;
-                }
+    // For each row/column in the freq_placement array calculate the number of LED's to 
+    // turn on based on the specified index in the normalized array
+    for (int row = 0; row < 6; row++) {
+        for (int col = 0; col < 6; col++) {
+            int data_index = FREQ_PLACEMENT[row][col], reading;
+
+            // Handle the special case where the index is less than or equal to 0
+            if (data_index < 0)
+                reading = rawReadings[-1*data_index - 1];
+            else if (data_index == 0)
+                reading = averageReading;
+            else
+                reading = normedReadings[data_index - 1];
+
+            // Turn on LED's until the freq threshold is not met
+            for (int layer = 0; layer < 6; layer++) {
+                if (reading >= FREQ_THRESHOLDS[layer])
+                    spectrumMatrix[layer][row][col] = true;
+                else
+                    break;
             }
         }
-        // Turn on led's until the freq threshold is not met
-        for (int layer = 0; layer < 6; layer++) {
-            if (normedReadings[i] >= FREQ_THRESHOLDS[layer])
-                spectrumMatrix[layer][row][col] = true;
-            else
-                break;
-        }
     }
+
     return;
 }
 
 void MSGEQ7::queueMatrix(Multiplexer output) {
-    output.setMatrix(spectrumMatrix);
+    if (DEBUG) {
+      for (int l = 0; l < 6; l++) {
+        for (int r = 0; r < 6; r++) {
+          for (int c = 0; c < 6; c++) {
+            Serial.print(spectrumMatrix[l][r][c]);
+            Serial.print(" ");
+          }
+          Serial.println("");
+        }
+        Serial.println("\n");
+      }
+    }
+    
+    output.setMatrix(spectrumMatrix, 0);
     return;
 }

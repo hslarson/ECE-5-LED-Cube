@@ -16,7 +16,7 @@
   - Uses memcpy to either queue a new matrix or allow the queued matrix to be shown
 - <b>nextLayer</b>
   - Handles the drawing of individual layers and the queuing of matrices
-  - First, calls the constructData() and bin2int() functions to format the data in a way that the registers will understand
+  - First, calls the constructData() function to format the data in a way that the registers will understand
   - Then, calls the sendData() function to send the data to the cube
 - <b>constructData</b>
   - A helper function for nextLayer() that handles the mapping of output pins and the conversion of the resultant binary array to an integer array
@@ -31,11 +31,11 @@
   - Takes the array from the getSpectrum() function and converts from 7 channels to 36
 - <b>makeSpectrumMatrix</b>
   - Maps each frequency band to a specific column of the cube
-  - Applies a threshold to the raw reading to decide how many LED’s to light in each column and constructs a boolean matrix based on this data
+  - Applies a threshold to the raw reading to decide how many LED’s to light in each column and constructs a Boolean matrix based on this data
 - <b>queueMatrix</b>
   - Calls the setMatrix() member of the Multiplexer class to queue the matrix that was built by the makeSpectrumMatrix() function
 
-### Volume Class:
+### VolumeControl Class:
 
 - <b>checkVolume</b>
   - Uses a timer and the getVolume() function to decide whether or not to draw a volume matrix
@@ -43,6 +43,6 @@
   - Reads data from the volume potentiometer and normalizes the reading
   - Creates a running average of the normalized readings
 - <b>makeVolumeMatrix</b>
-  - Takes the current volume reading and creates a boolean matrix that displays the volume as front-to-back bars that ascend each column then move from left to right to the next column
+  - Takes the current volume reading and creates a Boolean matrix that displays the volume as front-to-back bars that ascend each column then move from left to right to the next column
 - <b>queueMatrix</b>
   - Takes the matrix that was constructed by the makeVolumeMatrix and queues it to be shown on the cube

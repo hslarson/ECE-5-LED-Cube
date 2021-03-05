@@ -19,6 +19,9 @@ void subtasks(bool);
 
 
 void setup() {
+    // **Open the Serial Port**
+    if (DEBUG) Serial.begin(9600);
+
     // **Set PinModes**
     // Transistor Pins
     for (int layer = 0; layer < 6; layer++) {
@@ -48,14 +51,15 @@ void loop() {
 
     while (!finished_drawing_cube) {
         // Do one subtask before drawing each layer
-		if (!finished_subtask) {
-			subtasks();
+		    if (!finished_subtask) {
+			      subtasks(false);
             finished_subtask = true;
-		}
+		    }
 
-		// Attempt to show the layers on a preset interval
+		    // Attempt to show the layers on a preset interval
         else if ((int)abs(micros() - StartTime) / (int)LAYER_SHOW_TIME) {
             StartTime = micros();
+            finished_subtask = false;
 
             if (cube.nextLayer())
                 finished_drawing_cube = true;
@@ -64,7 +68,7 @@ void loop() {
 }
 
 
-void subtasks (bool reset = false) {
+void subtasks (bool reset) {
     static int task = 0;
     static bool mode = MODE_SPECTRUM;
 
@@ -82,19 +86,25 @@ void subtasks (bool reset = false) {
             mode = MODE_VOLUME;
         else
             mode = MODE_SPECTRUM;
+
+        if (DEBUG) {
+            Serial.print("Draw Mode: ");
+            Serial.print((mode ? "Spectrum\n" : "Volume\n"));
+        }
         break;
     
     // Collect data (if necessary)
     case 1:
         // Read data from the MSGEQ7 circuit
         if (mode == MODE_SPECTRUM)
-            analyser.getSpectrum();
+          analyser.getSpectrum();
+            
         break;
     
     // Construct the matrix
     case 2:
         if (mode == MODE_SPECTRUM)
-            analyser.makeSpectrumMatrix(); 
+          analyser.makeSpectrumMatrix();
         else
             volume.makeVolumeMatrix();
         break;

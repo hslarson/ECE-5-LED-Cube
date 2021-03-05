@@ -1,6 +1,8 @@
 #ifndef constants
 #define constants
 
+// ** Enable Debug Mode **
+const bool DEBUG = true;
 
 /*** PIN CONSTANTS ***/
 // Transistor Pins
@@ -75,7 +77,7 @@ const bool MODE_SPECTRUM = true;
 const bool MODE_VOLUME   = false;
 
 // The number of times to refresh the cube per second
-const int FRAME_RATE = 60;
+const int FRAME_RATE = 1;
 
 // The number of microseconds each layer is shown
 const double LAYER_SHOW_TIME = 1000000 / FRAME_RATE / 6;
@@ -85,11 +87,11 @@ const double LAYER_SHOW_TIME = 1000000 / FRAME_RATE / 6;
 /*
   How to set FREQ_PLACEMENT
 
-  This array describes which frequency maps to each column
+  [1, 36] : References a location in the normalized frequency array
+  [0]     : References the average of all of the raw frequency readings
+  [-1, -7]: References a location in the raw frequency array
 
-  The range of frequencies spans from 63HZ (Number 1) to 16KHZ (Number 36).
   Fill out the grid similarly to the pin_configuration array (see instructions above),
-  Be sure to use only numbers 1-36 since these correspond to columns, not shift register pins
 */
 const int FREQ_PLACEMENT[][6] = {
   //          ^
@@ -102,23 +104,27 @@ const int FREQ_PLACEMENT[][6] = {
   {31, 32, 33, 34, 35, 36}
 };
 
+// Use this to set the index of each of the raw frequency readings in the normed array
+// More Space = Greater "Resolution";
+const int PRIMARY_FREQ_LOCATIONS[] = {0, 6, 12, 18, 24, 30, 35};
+const int PRIMARY_FREQ_LOCATIONS_ASCENDING[] = {0, 6, 12, 18, 24, 30, 35}; // A sorted version of the previous array to make interpolation faster
+
 // This array sets the MINIMUM magnitude (0 - 1023) to light a particular layer of led's
 const int FREQ_THRESHOLDS[] = {146, 292, 438, 584, 730, 876};
 
-// Number of new channels we need to create between each real channel
-// Always evaluates to 5 but this helps demonstrate where it comes from
-const int NUM_FILLER_CHANNELS = round((float)(36 - 7) / (7 - 1));
+// How many points to consider in the rolling average
+const int FREQ_AVERAGING_POINTS = 4;
 
 
 /*** VOLUME CONSTANTS ***/
 // The amount by which the raw volume reading needs to change in order to display the volume (on a scale from 1 - 36)
 const int VOLUME_CHANGE_THRESHOLD = 2;
 
-// The analog reading when the knob is at it's lowest point
-const int VOLUME_MIN_READING = 456; // <--- Not right, I forgot what I tested it to be
+// How many points to consider in the rolling average
+const int VOLUME_AVERAGING_POINTS = 4;
 
 // The amount by which the raw volume reading must change to register as a different reading (1-36)
-const double VOLUME_INCREMENT_AMOUNT = (double)(1024 - VOLUME_MIN_READING) / 36;
+const double VOLUME_INCREMENT_AMOUNT = (double)1023 / 36;
 
 //The length of time (in miliseconds) the the volume will stay on the cube after no changes are detected
 const int VOLUME_LINGERING_TIME = 2000;
