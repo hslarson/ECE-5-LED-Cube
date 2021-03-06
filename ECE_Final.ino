@@ -9,7 +9,7 @@
 // Create Class Objects
 Multiplexer   cube;
 MSGEQ7        analyser;
-VolumeControl volume;
+VolumeControl knob;
 
 // Declare Timing Variable
 unsigned long int StartTime = micros();
@@ -38,6 +38,8 @@ void setup() {
     // **Initialize the SPI Bus**
     SPI.begin();
     SPI.beginTransaction(SPISettings(8000000 /* 8MHZ */, LSBFIRST, SPI_MODE0));
+
+    knob.checkVolume(1);
 }
 
 
@@ -57,7 +59,7 @@ void loop() {
 		    }
 
 		    // Attempt to show the layers on a preset interval
-        else if ((int)abs(micros() - StartTime) / (int)LAYER_SHOW_TIME) {
+        else if ((long)abs(micros() - StartTime) / (int)LAYER_SHOW_TIME) {
             StartTime = micros();
             finished_subtask = false;
 
@@ -82,7 +84,7 @@ void subtasks (bool reset) {
     // Check the state of the volume know
     case 0:
 		// Switch into volume mode if there have been changes in the volume knob
-        if (volume.checkVolume())
+        if (knob.checkVolume())
             mode = MODE_VOLUME;
         else
             mode = MODE_SPECTRUM;
@@ -106,7 +108,7 @@ void subtasks (bool reset) {
         if (mode == MODE_SPECTRUM)
           analyser.makeSpectrumMatrix();
         else
-            volume.makeVolumeMatrix();
+            knob.makeVolumeMatrix();
         break;
     
     // Queue the matrix to be shown
@@ -114,7 +116,7 @@ void subtasks (bool reset) {
         if (mode == MODE_SPECTRUM)
             analyser.queueMatrix(cube);
         else
-            volume.queueMatrix(cube);
+            knob.queueMatrix(cube);
         break;
     };
 
