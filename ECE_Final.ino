@@ -59,7 +59,7 @@ void loop() {
 		    }
 
 		    // Attempt to show the layers on a preset interval
-        else if ((long)abs(micros() - StartTime) / (int)LAYER_SHOW_TIME) {
+        else if (abs(micros() - StartTime) / (int)LAYER_SHOW_TIME) {
             StartTime = micros();
             finished_subtask = false;
 

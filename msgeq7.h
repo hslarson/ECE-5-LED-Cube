@@ -2,7 +2,7 @@ class MSGEQ7 {
 public:
     static void getSpectrum();
     static void makeSpectrumMatrix();
-    static void queueMatrix(Multiplexer);
+    static void queueMatrix(Multiplexer&);
 private:
     static void normSpectrum();
     static short averageReading;
@@ -101,15 +101,6 @@ void MSGEQ7::normSpectrum() {
         // Move to the next set of points
         data_pos++;
     }
-
-    if (DEBUG) {
-      /*
-      for (int freq : normedReadings) {
-        Serial.print(freq);
-        Serial.print(" ");
-      } Serial.println("\n");
-      */
-    }
     
     return;
 }
@@ -145,22 +136,7 @@ void MSGEQ7::makeSpectrumMatrix() {
     return;
 }
 
-void MSGEQ7::queueMatrix(Multiplexer output) {
-    if (DEBUG) {
-      /*
-      for (int l = 0; l < 6; l++) {
-        for (int r = 0; r < 6; r++) {
-          for (int c = 0; c < 6; c++) {
-            Serial.print(spectrumMatrix[l][r][c]);
-            Serial.print(" ");
-          }
-          Serial.println("");
-        }
-        Serial.println("\n");
-      }
-      */
-    }
-    
+void MSGEQ7::queueMatrix(Multiplexer &output) {    
     output.setMatrix(spectrumMatrix, 0);
     return;
 }

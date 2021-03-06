@@ -2,7 +2,7 @@ class VolumeControl {
 public:
     static bool checkVolume(bool);
     static void makeVolumeMatrix();
-    static void queueMatrix(Multiplexer);
+    static void queueMatrix(Multiplexer&);
 
 private:
     static void getVolume();
@@ -39,7 +39,7 @@ bool VolumeControl::checkVolume(bool init = false) {
     }
 
     // Check if we're within the volume lingering period
-    if (recentChange && !((int)abs(millis() - lastChange) / VOLUME_LINGERING_TIME))
+    if (recentChange && !(abs(millis() - lastChange) / VOLUME_LINGERING_TIME))
         return 1; 
     else
         recentChange = false;
@@ -85,7 +85,7 @@ void VolumeControl::makeVolumeMatrix() {
     return;
 }
 
-void VolumeControl::queueMatrix(Multiplexer output) {
+void VolumeControl::queueMatrix(Multiplexer &output) {
     output.setMatrix(volumeMatrix, 0);
     return;
 }
