@@ -35,7 +35,7 @@ void setup() {
     // MSGEQ7 Pins
     pinMode(AnalyserReset, OUTPUT);
     pinMode(AnalyserStrobe,OUTPUT);
-    pinMode(AnalyserData, INPUT);
+    pinMode(AnalyserData,  INPUT);
 
     // **Initialize Volume Class**
     knob.checkVolume(1);

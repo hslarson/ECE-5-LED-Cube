@@ -26,7 +26,7 @@ void MSGEQ7::getSpectrum() {
     digitalWrite(AnalyserReset, LOW);
     
     // Read Data from the Chip
-    for (short x = 0; x < 7; x++){
+    for (int x = 0; x < 7; x++){
         analogWrite(AnalyserStrobe, 0);
         // digitalWrite(AnalyserStrobe, LOW);
         
@@ -43,14 +43,6 @@ void MSGEQ7::getSpectrum() {
         if (x < 6)
           delayMicroseconds(100);
     }
-
-    if (DEBUG) {
-      for (int i = 0; i < 7; i++) {
-        Serial.print(tempReadings[i]);
-        Serial.print(' ');
-      }
-      Serial.println("");
-    }
     
     // Apply the rolling average filter to the data we colloected
     for (short i = 0; i < 7; i++) {
@@ -59,12 +51,13 @@ void MSGEQ7::getSpectrum() {
     }
 
     if (DEBUG) {
-      /*
+      Serial.print("Temp Readings: ");
       for (int temp : tempReadings) {
         Serial.print(temp);
         Serial.print(' ');
       } Serial.println("");
-      
+
+      Serial.print("Avg. Readings:")
       for (int raw : rawReadings) {
         Serial.print(raw);
         Serial.print(' ');
@@ -121,9 +114,9 @@ void MSGEQ7::makeSpectrumMatrix() {
 
     // For each row/column in the freq_placement array calculate the number of LED's to 
     // turn on based on the specified index in the normalized array
-    for (short row = 0; row < 6; row++) {
-        for (short col = 0; col < 6; col++) {
-            short data_index = FREQ_PLACEMENT[row][col], reading;
+    for (int row = 0; row < 6; row++) {
+        for (int col = 0; col < 6; col++) {
+            int data_index = FREQ_PLACEMENT[row][col], reading;
 
             // Handle the special case where the index is less than or equal to 0
             if (data_index < 0)
@@ -134,7 +127,7 @@ void MSGEQ7::makeSpectrumMatrix() {
                 reading = normedReadings[data_index - 1];
 
             // Turn on LED's until the freq threshold is not met
-            for (short layer = 0; layer < 6; layer++) {
+            for (int layer = 0; layer < 6; layer++) {
                 if (reading >= FREQ_THRESHOLDS[layer])
                     spectrumMatrix[layer][row][col] = true;
                 else

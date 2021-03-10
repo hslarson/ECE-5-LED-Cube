@@ -56,7 +56,7 @@ bool Multiplexer::nextLayer() {
     lastLayer = currentLayer;
     if (currentLayer == 5) {
         currentLayer = 0;
-        setMatrix(newMatrix, true);
+        setMatrix(newMatrix, 1);
         return true;
     }
     else {
@@ -68,20 +68,21 @@ bool Multiplexer::nextLayer() {
 void Multiplexer::constructData(int layer) {
     // Place the bits of data into the data array based on the pin configuration setting
     bool temp_data[48] = {0};
-    for (short r = 0; r < 6; r++) {
-        for (short c = 0; c < 6; c++) {
+    for (int r = 0; r < 6; r++) {
+        for (int c = 0; c < 6; c++) {
             temp_data[PIN_CONFIGURATION[r][c] - 1] = matrix[layer][r][c];
         }
     }
 
     // Convert the binary array we just created into an array of integers
-    for (short sr = 0, arr_pos = 0; sr < 6; sr++) {
+    for (int sr = 0, arr_pos = 0; sr < 6; sr++) {
         // For each byte int the private data array, convert it to an int and save it to the output array
-        short out_num = 0;
+        int out_num = 0;
         for (int b = 7; b >= 0; b--) {
             out_num += temp_data[arr_pos] * pow(2, b);
             arr_pos++;
         }
+        
         outputData[sr] = out_num;
     }
 
@@ -91,7 +92,7 @@ void Multiplexer::constructData(int layer) {
 void Multiplexer::sendToCube() {
     // Send the the data to the shift registers
     digitalWrite(ShiftLatchPin, LOW);
-    for (short i = 6; i > 0; i--) {
+    for (int i = 6; i > 0; i--) {
         shiftOut(ShiftDataPin, ShiftClockPin, LSBFIRST, outputData[i]);
     }
     // Update the layer transistors and display the output of the shift registers
