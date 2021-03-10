@@ -27,19 +27,29 @@ void MSGEQ7::getSpectrum() {
     
     // Read Data from the Chip
     for (short x = 0; x < 7; x++){
-        digitalWrite(AnalyserStrobe, LOW);
+        analogWrite(AnalyserStrobe, 0);
+        // digitalWrite(AnalyserStrobe, LOW);
         
         // Allow the Output to Settle
         delayMicroseconds(35);
         
         // Save reading
         tempReadings[x] = analogRead(AnalyserData);
-        
-        digitalWrite(AnalyserStrobe, HIGH);
+
+        analogWrite(AnalyserStrobe, 255);
+        // digitalWrite(AnalyserStrobe, HIGH);
         
         // Wait Before Strobing Again (unless this is the last reading)
         if (x < 6)
           delayMicroseconds(100);
+    }
+
+    if (DEBUG) {
+      for (int i = 0; i < 7; i++) {
+        Serial.print(tempReadings[i]);
+        Serial.print(' ');
+      }
+      Serial.println("");
     }
     
     // Apply the rolling average filter to the data we colloected

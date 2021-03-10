@@ -92,7 +92,7 @@ void Multiplexer::sendToCube() {
     // Send the the data to the shift registers
     digitalWrite(ShiftLatchPin, LOW);
     for (short i = 6; i > 0; i--) {
-        SPI.transfer(outputData[i]);
+        shiftOut(ShiftDataPin, ShiftClockPin, LSBFIRST, outputData[i]);
     }
     // Update the layer transistors and display the output of the shift registers
     digitalWrite(LAYER_PINS[lastLayer], LOW);

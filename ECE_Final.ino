@@ -1,5 +1,4 @@
 #include <math.h>
-#include <SPI.h>
 
 #include "constants.h"
 #include "multiplexer.h"
@@ -30,15 +29,15 @@ void setup() {
 
     // Shift Register Pins
     pinMode(ShiftLatchPin, OUTPUT);
+    pinMode(ShiftDataPin,  OUTPUT);
+    pinMode(ShiftLatchPin, OUTPUT);
 
     // MSGEQ7 Pins
-    pinMode(AnalyserReset,  OUTPUT);
-    pinMode(AnalyserStrobe, OUTPUT);
+    pinMode(AnalyserReset, OUTPUT);
+    pinMode(AnalyserStrobe,OUTPUT);
+    pinMode(AnalyserData, INPUT);
 
-    // **Initialize the SPI Bus**
-    SPI.begin();
-    SPI.beginTransaction(SPISettings(8000000 /* 8MHZ */, LSBFIRST, SPI_MODE0));
-
+    // **Initialize Volume Class**
     knob.checkVolume(1);
 }
 

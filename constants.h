@@ -6,24 +6,25 @@
 
 /*** PIN CONSTANTS ***/
 // Transistor Pins
-#define Layer1 2
-#define Layer2 3
-#define Layer3 4
+#define Layer1 8
+#define Layer2 7
+#define Layer3 6
 #define Layer4 5
-#define Layer5 6
-#define Layer6 7
+#define Layer5 4
+#define Layer6 3
 
 // Shift Register Pins
-// (Since we're using the SPI bus, MOSI(Pin 11) and SCK(Pin 13) correspond to data and clock,  respectively)
-#define ShiftLatchPin 10
+#define ShiftClockPin 12
+#define ShiftDataPin  11
+#define ShiftLatchPin 9
 
 // MSGEQ7 Pins
-#define AnalyserData   0 //A0
-#define AnalyserReset  8
-#define AnalyserStrobe 9
+#define AnalyserData   A1
+#define AnalyserReset  2
+#define AnalyserStrobe A2 // IF YOU CHANGE THIS TO A DIGITAL PIN, YOU NEED TO CHANGE getSpectrum DEFINITION
 
 // Volume Knob Pin
-#define VolumePin 1 //A1
+#define VolumePin A0
 
 
 /*** DISPLAY CONSTANTS ***/
@@ -60,17 +61,17 @@
 const short PIN_CONFIGURATION[][6] = {
   //          ^
   //        Front
-  {1,  2,  3,  4,  5,  6 },
-  {7,  8,  9,  10, 11, 12},
-  {13, 14, 15, 16, 17, 18},
-  {19, 20, 21, 22, 23, 24},
-  {25, 26, 27, 28, 29, 30},
-  {31, 32, 33, 34, 35, 36}
+  {48, 37, 39, 47, 46, 38},
+  {37, 34, 36, 43, 34, 45},
+  {30, 24, 42, 35, 31, 32},
+  {29, 23, 28, 22, 27, 21},
+  {26, 19, 14, 16, 15, 20},
+  {18, 13, 12, 10,  8, 11}
 };
 
 
 // Organizes the layer pins so they can be iterated through more easily
-const short LAYER_PINS[] = {Layer1, Layer2, Layer3, Layer4, Layer5, Layer6};
+const int LAYER_PINS[] = {Layer1, Layer2, Layer3, Layer4, Layer5, Layer6};
 
 // Display modes
 #define MODE_SPECTRUM true
@@ -124,7 +125,7 @@ const short FREQ_THRESHOLDS[] = {0 /*146*/, 292, 438, 584, 730, 876};
 #define VOLUME_AVERAGING_POINTS 4
 
 // The amount by which the raw volume reading must change to register as a different reading (1-36)
-#define VOLUME_INCREMENT_AMOUNT (double)1023/36
+#define VOLUME_INCREMENT_AMOUNT ((double)1023/36)
 
 //The length of time (in miliseconds) the the volume will stay on the cube after no changes are detected
 #define VOLUME_LINGERING_TIME 2000
