@@ -87,5 +87,6 @@ void VolumeControl::makeVolumeMatrix() {
 
 void VolumeControl::queueMatrix(Multiplexer &output) {
     output.setMatrix(volumeMatrix, 0);
+    memset(&volumeMatrix[0][0][0], 0, (6*6*6)*sizeof(bool));
     return;
 }

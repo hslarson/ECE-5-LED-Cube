@@ -27,8 +27,7 @@ void MSGEQ7::getSpectrum() {
     
     // Read Data from the Chip
     for (int x = 0; x < 7; x++){
-        analogWrite(AnalyserStrobe, 0);
-        // digitalWrite(AnalyserStrobe, LOW);
+        digitalWrite(AnalyserStrobe, LOW);
         
         // Allow the Output to Settle
         delayMicroseconds(35);
@@ -36,8 +35,7 @@ void MSGEQ7::getSpectrum() {
         // Save reading
         tempReadings[x] = analogRead(AnalyserData);
 
-        analogWrite(AnalyserStrobe, 255);
-        // digitalWrite(AnalyserStrobe, HIGH);
+        digitalWrite(AnalyserStrobe, HIGH);
         
         // Wait Before Strobing Again (unless this is the last reading)
         if (x < 6)
@@ -57,12 +55,12 @@ void MSGEQ7::getSpectrum() {
         Serial.print(' ');
       } Serial.println("");
 
-      Serial.print("Avg. Readings:")
+      Serial.print("Avg. Readings:");
       for (int raw : rawReadings) {
         Serial.print(raw);
         Serial.print(' ');
       } Serial.println("\n");
-      */
+
     }
 
     // Calculate the average of the readings we just found
@@ -141,5 +139,6 @@ void MSGEQ7::makeSpectrumMatrix() {
 
 void MSGEQ7::queueMatrix(Multiplexer &output) {    
     output.setMatrix(spectrumMatrix, 0);
+    memset(&spectrumMatrix[0][0][0], 0, (6*6*6)*sizeof(bool));
     return;
 }

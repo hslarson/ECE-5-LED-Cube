@@ -2,16 +2,16 @@
 #define constants
   
 // ** Enable Debug Mode **
-#define DEBUG true
+#define DEBUG false
 
 /*** PIN CONSTANTS ***/
 // Transistor Pins
 #define Layer1 8
 #define Layer2 7
 #define Layer3 6
-#define Layer4 5
-#define Layer5 4
-#define Layer6 3
+#define Layer4 3
+#define Layer5 5
+#define Layer6 4
 
 // Shift Register Pins
 #define ShiftClockPin 12
@@ -21,7 +21,7 @@
 // MSGEQ7 Pins
 #define AnalyserData   A1
 #define AnalyserReset  2
-#define AnalyserStrobe A2 // IF YOU CHANGE THIS TO A DIGITAL PIN, YOU NEED TO CHANGE getSpectrum DEFINITION
+#define AnalyserStrobe A2
 
 // Volume Knob Pin
 #define VolumePin A0
@@ -78,10 +78,10 @@ const int LAYER_PINS[] = {Layer1, Layer2, Layer3, Layer4, Layer5, Layer6};
 #define MODE_VOLUME false
 
 // The number of times to refresh the cube per second
-#define FRAME_RATE 1
+#define FRAME_RATE 60
 
 // The number of microseconds each layer is shown
-#define LAYER_SHOW_TIME (double)1000000/FRAME_RATE/6
+#define LAYER_SHOW_TIME ((double)1000000/FRAME_RATE/6)
 
 
 /*** AUDIO ANALYSER CONSTANTS ***/
@@ -111,7 +111,8 @@ const short PRIMARY_FREQ_LOCATIONS[] = {0, 6, 12, 18, 24, 30, 35};
 const short PRIMARY_FREQ_LOCATIONS_ASCENDING[] = {0, 6, 12, 18, 24, 30, 35}; // A sorted version of the previous array to make interpolation faster
 
 // This array sets the MINIMUM magnitude (0 - 1023) to light a particular layer of led's
-const short FREQ_THRESHOLDS[] = {0 /*146*/, 292, 438, 584, 730, 876};
+// const short FREQ_THRESHOLDS[] = {0 , 29, 78, 94, 130, 276};
+const short FREQ_THRESHOLDS[] = {146, 292, 438, 584, 730, 876};
 
 // How many points to consider in the rolling average
 #define FREQ_AVERAGING_POINTS 4

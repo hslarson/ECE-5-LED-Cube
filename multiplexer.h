@@ -79,7 +79,7 @@ void Multiplexer::constructData(int layer) {
         // For each byte int the private data array, convert it to an int and save it to the output array
         int out_num = 0;
         for (int b = 7; b >= 0; b--) {
-            out_num += temp_data[arr_pos] * pow(2, b);
+            out_num += temp_data[arr_pos] * 1 << b;
             arr_pos++;
         }
         
@@ -92,7 +92,7 @@ void Multiplexer::constructData(int layer) {
 void Multiplexer::sendToCube() {
     // Send the the data to the shift registers
     digitalWrite(ShiftLatchPin, LOW);
-    for (int i = 6; i > 0; i--) {
+    for (int i = 5; i >= 0; i--) {
         shiftOut(ShiftDataPin, ShiftClockPin, LSBFIRST, outputData[i]);
     }
     // Update the layer transistors and display the output of the shift registers

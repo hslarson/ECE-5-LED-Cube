@@ -30,7 +30,7 @@ void setup() {
     // Shift Register Pins
     pinMode(ShiftLatchPin, OUTPUT);
     pinMode(ShiftDataPin,  OUTPUT);
-    pinMode(ShiftLatchPin, OUTPUT);
+    pinMode(ShiftClockPin, OUTPUT);
 
     // MSGEQ7 Pins
     pinMode(AnalyserReset, OUTPUT);
