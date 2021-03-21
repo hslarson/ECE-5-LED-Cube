@@ -21,14 +21,14 @@ short Multiplexer::outputData[6] = {0};
 
 void Multiplexer::setMatrix(bool inMatrix[][6][6], bool mode) {
 
-    // Mode 0 takes a brand new matrix and queues it to be shown
+    // Mode 0 takes a brand-new matrix and queues it to be shown
     if (!mode)
-      memcpy(&newMatrix[0][0][0], &inMatrix[0][0][0], (6*6*6)*sizeof(bool));
-    
+        memcpy(&newMatrix[0][0][0], &inMatrix[0][0][0], (6*6*6)*sizeof(bool));
+
     // Mode 1 sets the display matrix to some new matrix (presumably newMatrix)
     else
-      memcpy(&matrix[0][0][0], &inMatrix[0][0][0], (6*6*6)*sizeof(bool));
-    
+        memcpy(&matrix[0][0][0], &inMatrix[0][0][0], (6*6*6)*sizeof(bool));
+
     return;
 }
 
@@ -38,15 +38,15 @@ bool Multiplexer::nextLayer() {
     constructData(currentLayer);
 
     if (DEBUG) {
-      Serial.print("Layer ");
-      Serial.print(currentLayer);
-      Serial.print(": ");
+        Serial.print("Layer ");
+        Serial.print(currentLayer);
+        Serial.print(": ");
 
-      for (int num : outputData) {
-        Serial.print(num);
-        Serial.print(" ");
-      }
-      Serial.println("");
+        for (int num : outputData) {
+            Serial.print(num);
+            Serial.print(" ");
+        }
+        Serial.println("");
     }
 
     // Send the data to the shift registers and turn on the current layer
@@ -82,7 +82,7 @@ void Multiplexer::constructData(int layer) {
             out_num += temp_data[arr_pos] * 1 << b;
             arr_pos++;
         }
-        
+
         outputData[sr] = out_num;
     }
 

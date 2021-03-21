@@ -7,7 +7,7 @@
 
 // Create Class Objects
 Multiplexer   cube;
-MSGEQ7        analyser;
+MSGEQ7        analyzer;
 VolumeControl knob;
 
 // Declare Timing Variable
@@ -33,9 +33,9 @@ void setup() {
     pinMode(ShiftClockPin, OUTPUT);
 
     // MSGEQ7 Pins
-    pinMode(AnalyserReset, OUTPUT);
-    pinMode(AnalyserStrobe,OUTPUT);
-    pinMode(AnalyserData,  INPUT);
+    pinMode(AnalyzerReset, OUTPUT);
+    pinMode(AnalyzerStrobe,OUTPUT);
+    pinMode(AnalyzerData,  INPUT);
 
     // **Initialize Volume Class**
     knob.checkVolume(1);
@@ -52,12 +52,12 @@ void loop() {
 
     while (!finished_drawing_cube) {
         // Do one subtask before drawing each layer
-		    if (!finished_subtask) {
-			      subtasks(false);
+        if (!finished_subtask) {
+            subtasks(false);
             finished_subtask = true;
-		    }
+        }
 
-		    // Attempt to show the layers on a preset interval
+        // Attempt to show the layers on a preset interval
         else if (abs(micros() - StartTime) / (int)LAYER_SHOW_TIME) {
             StartTime = micros();
             finished_subtask = false;
@@ -82,7 +82,7 @@ void subtasks (bool reset) {
 
     // Check the state of the volume know
     case 0:
-		// Switch into volume mode if there have been changes in the volume knob
+        // Switch into volume mode if there have been changes in the volume knob
         if (knob.checkVolume())
             mode = MODE_VOLUME;
         else
@@ -93,27 +93,27 @@ void subtasks (bool reset) {
             Serial.print((mode ? "Spectrum\n" : "Volume\n"));
         }
         break;
-    
+
     // Collect data (if necessary)
     case 1:
         // Read data from the MSGEQ7 circuit
         if (mode == MODE_SPECTRUM)
-          analyser.getSpectrum();
-            
+            analyzer.getSpectrum();
+
         break;
-    
+
     // Construct the matrix
     case 2:
         if (mode == MODE_SPECTRUM)
-          analyser.makeSpectrumMatrix();
+            analyzer.makeSpectrumMatrix();
         else
             knob.makeVolumeMatrix();
         break;
-    
+
     // Queue the matrix to be shown
     case 3:
         if (mode == MODE_SPECTRUM)
-            analyser.queueMatrix(cube);
+            analyzer.queueMatrix(cube);
         else
             knob.queueMatrix(cube);
         break;

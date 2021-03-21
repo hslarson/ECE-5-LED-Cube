@@ -9,7 +9,7 @@ private:
 
     static double rawVolume;
     static short currentVolume, lastVolume;
-    static bool recentChange; 
+    static bool recentChange;
     static unsigned long lastChange;
     static bool volumeMatrix[6][6][6];
 };
@@ -26,8 +26,8 @@ bool VolumeControl::checkVolume(bool init = false) {
     getVolume();
 
     if (init) {
-      lastVolume = currentVolume;
-      return 0;
+        lastVolume = currentVolume;
+        return 0;
     }
 
     // Check if the volume has changed beyond the threshold
@@ -40,7 +40,7 @@ bool VolumeControl::checkVolume(bool init = false) {
 
     // Check if we're within the volume lingering period
     if (recentChange && !(abs(millis() - lastChange) / VOLUME_LINGERING_TIME))
-        return 1; 
+        return 1;
     else
         recentChange = false;
 
@@ -54,9 +54,9 @@ void VolumeControl::getVolume() {
     // Apply the rolling average filter
     if (rawVolume < 0)
         rawVolume = knob_reading;
-    else 
+    else
         rawVolume = (double)(VOLUME_AVERAGING_POINTS - 1) / VOLUME_AVERAGING_POINTS * knob_reading
-                      + (1.0 / VOLUME_AVERAGING_POINTS) * rawVolume;
+                    + (1.0 / VOLUME_AVERAGING_POINTS) * rawVolume;
 
     // Normalize the reading
     currentVolume = round(rawVolume / VOLUME_INCREMENT_AMOUNT);
@@ -71,7 +71,7 @@ void VolumeControl::makeVolumeMatrix() {
     // Continue lighting rows until num bars = 0
     for (short col = 5; col >= 0 && !break_all; col--) {
         for (short layer = 0; layer < 6 && !break_all; layer++) {
-            
+
             for(short row = 0; row < 6; row++) {
                 volumeMatrix[layer][row][col] = true;
             }

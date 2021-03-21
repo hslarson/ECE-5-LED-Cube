@@ -21,45 +21,47 @@ void MSGEQ7::getSpectrum() {
     short tempReadings[7] = {0};
 
     // Reset the Chip
-    digitalWrite(AnalyserReset, HIGH);
+    digitalWrite(AnalyzerReset, HIGH);
     delayMicroseconds(100);
-    digitalWrite(AnalyserReset, LOW);
-    
+    digitalWrite(AnalyzerReset, LOW);
+
     // Read Data from the Chip
-    for (int x = 0; x < 7; x++){
-        digitalWrite(AnalyserStrobe, LOW);
-        
+    for (int x = 0; x < 7; x++) {
+        digitalWrite(AnalyzerStrobe, LOW);
+
         // Allow the Output to Settle
         delayMicroseconds(35);
-        
-        // Save reading
-        tempReadings[x] = analogRead(AnalyserData);
 
-        digitalWrite(AnalyserStrobe, HIGH);
-        
+        // Save reading
+        tempReadings[x] = analogRead(AnalyzerData);
+
+        digitalWrite(AnalyzerStrobe, HIGH);
+
         // Wait Before Strobing Again (unless this is the last reading)
         if (x < 6)
-          delayMicroseconds(100);
+            delayMicroseconds(100);
     }
-    
-    // Apply the rolling average filter to the data we colloected
+
+    // Apply the rolling average filter to the data we collected
     for (short i = 0; i < 7; i++) {
         rawReadings[i] = round((double)(FREQ_AVERAGING_POINTS - 1) / FREQ_AVERAGING_POINTS * rawReadings[i]
-                             + (1.0 / FREQ_AVERAGING_POINTS) * tempReadings[i]);
+                               + (1.0 / FREQ_AVERAGING_POINTS) * tempReadings[i]);
     }
 
     if (DEBUG) {
-      Serial.print("Temp Readings: ");
-      for (int temp : tempReadings) {
-        Serial.print(temp);
-        Serial.print(' ');
-      } Serial.println("");
+        Serial.print("Temp Readings: ");
+        for (int temp : tempReadings) {
+            Serial.print(temp);
+            Serial.print(' ');
+        }
+        Serial.println("");
 
-      Serial.print("Avg. Readings:");
-      for (int raw : rawReadings) {
-        Serial.print(raw);
-        Serial.print(' ');
-      } Serial.println("\n");
+        Serial.print("Avg. Readings:");
+        for (int raw : rawReadings) {
+            Serial.print(raw);
+            Serial.print(' ');
+        }
+        Serial.println("\n");
 
     }
 
@@ -83,14 +85,14 @@ void MSGEQ7::normSpectrum() {
     short left_index, right_index;
     short left_data, right_data;
     while (data_pos < 6) {
-        // Set the left and right indicies and get the array values 
+        // Set the left and right indices and get the array values
         left_index  = PRIMARY_FREQ_LOCATIONS_ASCENDING[data_pos];
         right_index = PRIMARY_FREQ_LOCATIONS_ASCENDING[data_pos + 1];
 
         left_data  = normedReadings[left_index];
         right_data = normedReadings[right_index];
 
-        // Create a function in the form y=mx+b that inperpolates the data between the left and right indices
+        // Create a function in the form y=mx+b that interpolates the data between the left and right indices
         double m = (double)(right_data - left_data) / (right_index - left_index);
         double b = (-m * left_index) + left_data;
 
@@ -102,7 +104,7 @@ void MSGEQ7::normSpectrum() {
         // Move to the next set of points
         data_pos++;
     }
-    
+
     return;
 }
 
@@ -110,7 +112,7 @@ void MSGEQ7::makeSpectrumMatrix() {
     // We must normalize the raw readings before making the spectrum matrix
     normSpectrum();
 
-    // For each row/column in the freq_placement array calculate the number of LED's to 
+    // For each row/column in the freq_placement array calculate the number of LED's to
     // turn on based on the specified index in the normalized array
     for (int row = 0; row < 6; row++) {
         for (int col = 0; col < 6; col++) {
@@ -137,7 +139,7 @@ void MSGEQ7::makeSpectrumMatrix() {
     return;
 }
 
-void MSGEQ7::queueMatrix(Multiplexer &output) {    
+void MSGEQ7::queueMatrix(Multiplexer &output) {
     output.setMatrix(spectrumMatrix, 0);
     memset(&spectrumMatrix[0][0][0], 0, (6*6*6)*sizeof(bool));
     return;

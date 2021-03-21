@@ -1,6 +1,7 @@
 #ifndef constants
 #define constants
-  
+
+
 // ** Enable Debug Mode **
 #define DEBUG false
 
@@ -19,9 +20,9 @@
 #define ShiftLatchPin 9
 
 // MSGEQ7 Pins
-#define AnalyserData   A1
-#define AnalyserReset  2
-#define AnalyserStrobe A2
+#define AnalyzerData   A1
+#define AnalyzerReset  2
+#define AnalyzerStrobe A2
 
 // Volume Knob Pin
 #define VolumePin A0
@@ -31,7 +32,7 @@
 /*
   How to set PIN_CONFIGURATION
 
-  Transistor Array 1:  Transistor Array 2:  Transistor Array 3:
+  Shift Register 1:    Shift Register 2:    Shift Register 3:
   Q0: 1                Q0: 9                Q0: 17             
   Q1: 2                Q1: 10               Q1: 18             
   Q2: 3                Q2: 11               Q2: 19             
@@ -41,7 +42,7 @@
   Q6: 7                Q6: 15               Q6: 23             
   Q7: 8                Q7: 16               Q7: 24             
 
-  Transistor Array 4:  Transistor Array 5:  Transistor Array 6:
+  Shift Register 4:    Shift Register 5:    Shift Register 6:
   Q0: 25               Q0: 33               Q0: 41             
   Q1: 26               Q1: 34               Q1: 42             
   Q2: 27               Q2: 35               Q2: 43             
@@ -84,7 +85,7 @@ const int LAYER_PINS[] = {Layer1, Layer2, Layer3, Layer4, Layer5, Layer6};
 #define LAYER_SHOW_TIME ((double)1000000/FRAME_RATE/6)
 
 
-/*** AUDIO ANALYSER CONSTANTS ***/
+/*** AUDIO analyzer CONSTANTS ***/
 /*
   How to set FREQ_PLACEMENT
 
@@ -92,8 +93,12 @@ const int LAYER_PINS[] = {Layer1, Layer2, Layer3, Layer4, Layer5, Layer6};
   [0]     : References the average of all of the raw frequency readings
   [-1, -7]: References a location in the raw frequency array
 
-  Fill out the grid similarly to the pin_configuration array (see instructions above),
+  Fill out the grid similarly to the pin_configuration array (see instructions above)
+  You'll also find several examples below
 */
+
+/*
+// Normal
 const short FREQ_PLACEMENT[][6] = {
   //          ^
   //        Front
@@ -104,6 +109,50 @@ const short FREQ_PLACEMENT[][6] = {
   {25, 26, 27, 28, 29, 30},
   {31, 32, 33, 34, 35, 36}
 };
+*/
+
+
+// 90-Degree Rotated
+const short FREQ_PLACEMENT[][6] = {
+  //          ^
+  //        Front
+  {31, 25, 19, 13, 7,  1},
+  {32, 26, 20, 14, 8,  2},
+  {33, 27, 21, 15, 9,  3},
+  {34, 28, 22, 16, 10, 4},
+  {35, 29, 23, 17, 11, 5},
+  {36, 30, 24, 18, 12, 6}
+};
+
+
+/*
+// Sprial
+const short FREQ_PLACEMENT[][6] = {
+  //          ^
+  //        Front
+  {1,  2,  3,  4,  5,  6 },
+  {20, 21, 22, 23, 24, 7 },
+  {19, 32, 33, 34, 25, 8 },
+  {18, 31, 36, 35, 26, 9 },
+  {17, 30, 29, 28, 27, 10},
+  {16, 15, 14, 13, 12, 11}
+};
+*/
+
+/*
+// Blocks
+const short FREQ_PLACEMENT[][6] = {
+  //          ^
+  //        Front
+  {-1,-1,  -2,-2,  -3,-3},
+  {-1,-1,  -2,-2,  -3,-3},
+  {-1,-1,  -2,-2,  -3,-3},
+  
+  {-5,-5,  -6,-6,  -7,-7},
+  {-5,-5,  -6,-6,  -7,-7},
+  {-5,-5,  -6,-6,  -7,-7}
+};
+*/
 
 // Use this to set the index of each of the raw frequency readings in the normed array
 // More Space = Greater "Resolution";
@@ -128,7 +177,7 @@ const short FREQ_THRESHOLDS[] = {146, 292, 438, 584, 730, 876};
 // The amount by which the raw volume reading must change to register as a different reading (1-36)
 #define VOLUME_INCREMENT_AMOUNT ((double)1023/36)
 
-//The length of time (in miliseconds) the the volume will stay on the cube after no changes are detected
+//The length of time (in milliseconds) the volume will stay on the cube after no changes are detected
 #define VOLUME_LINGERING_TIME 2000
 
 
