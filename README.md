@@ -20,7 +20,7 @@
   - Then, calls the sendData() function to send the data to the cube
 - <b>constructData</b>
   - A helper function for nextLayer() that handles the mapping of output pins and the conversion of the resultant binary array to an integer array
-- <b>SendToCube</b>
+- <b>sendToCube</b>
   - Uses the SPI bus to send the data from the constructData() function to the shift registers
 
 ### MSGEQ7 Class:
