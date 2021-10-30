@@ -1,4 +1,8 @@
-﻿### Main Program:
+﻿[![Cube GIF](https://i.ibb.co/CWw726G/IMG-7925.gif)](https://photos.app.goo.gl/J5VMb96Lni4Fbc2d9 "More Images")
+
+<hr />
+
+### Main Program:
 
 - <b> loop </b>
   - Calls the nextLayer() member  function of the Multiplexer class on a preset interval
