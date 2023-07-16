@@ -2,6 +2,17 @@
 
 <hr />
 
+## Functionality:
+- The cube lights up based on the frequency spectrum of incoming audio
+- Each column represents a different frequency
+- The stronger the frequency component is, the more LEDs will be on in that column
+- Two 3.5mm jacks allow for audio passthrough
+- A knob allows for volume control at the output
+- The cube will display the volume state whenever the knob is adjusted
+
+<hr />
+
+## Software Details
 ### Main Program:
 
 - <b> loop </b>
