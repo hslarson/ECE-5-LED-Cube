@@ -22,24 +22,32 @@ void MSGEQ7::getSpectrum() {
 
     // Reset the Chip
     digitalWrite(AnalyzerReset, HIGH);
-    delayMicroseconds(100);
+    delayMicroseconds(RESET_PULSE_WIDTH);
     digitalWrite(AnalyzerReset, LOW);
 
+    // Reset-to-strobe delay
+    delayMicroseconds(T_RESET_TO_STROBE);
+
+    // Calculate strobe pulse width
+    const int STROBE_LOW_TIME = max(T_OUTPUT_SETTLE, STROBE_PULSE_WIDTH);
+    const int STROBE_HIGH_TIME  = max(STROBE_PULSE_WIDTH, T_STROBE_TO_STROBE-STROBE_LOW_TIME);
+    
     // Read Data from the Chip
     for (int x = 0; x < 7; x++) {
+        
         digitalWrite(AnalyzerStrobe, LOW);
 
         // Allow the Output to Settle
-        delayMicroseconds(35);
+        delayMicroseconds(STROBE_LOW_TIME);
 
         // Save reading
         tempReadings[x] = analogRead(AnalyzerData);
 
         digitalWrite(AnalyzerStrobe, HIGH);
 
-        // Wait Before Strobing Again (unless this is the last reading)
-        if (x < 6)
-            delayMicroseconds(100);
+        if (x != 6) {
+          delayMicroseconds(STROBE_HIGH_TIME);
+        }
     }
 
     // Apply the rolling average filter to the data we collected
