@@ -5,8 +5,8 @@
 
 #define clk 12
 #define dat 11
-#define lat 9
-#define lyr 8
+#define lat 10
+#define lyr 6
 
 int c = 0;
 

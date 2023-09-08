@@ -7,12 +7,12 @@
 
 /*** PIN CONSTANTS ***/
 // Transistor Pins
-#define Layer1 2
-#define Layer2 3
-#define Layer3 4
+#define Layer1 4
+#define Layer2 2
+#define Layer3 7
 #define Layer4 5
-#define Layer5 6
-#define Layer6 7
+#define Layer5 3
+#define Layer6 6
 
 // Shift Register Pins
 #define ShiftClockPin 12
@@ -62,12 +62,12 @@
 const short PIN_CONFIGURATION[][6] = {
   //          ^
   //        Front
-  {48, 40, 39, 47, 46, 38},
-  {37, 44, 36, 43, 34, 45},
-  {30, 24, 42, 35, 31, 32},
-  {29, 23,  5, 22, 27, 21},
-  {26, 19, 14, 16, 15, 20},
-  {18, 13, 10, 12,  8, 11}
+  { 1,  9, 10,  2,  3, 11},
+  {12,  5, 13,  6, 14,  4},
+  {17, 24,  7, 15,  8, 16},
+  {18, 25, 19, 36, 20, 27},
+  {21, 28, 26, 22, 23, 29},
+  {30, 31, 34, 32, 35, 33}
 };
 
 
@@ -79,7 +79,7 @@ const int LAYER_PINS[] = {Layer1, Layer2, Layer3, Layer4, Layer5, Layer6};
 #define MODE_VOLUME false
 
 // The number of times to refresh the cube per second
-#define FRAME_RATE 60
+#define FRAME_RATE 110
 
 // The number of microseconds each layer is shown
 #define LAYER_SHOW_TIME ((double)1000000/FRAME_RATE/6)
@@ -111,7 +111,7 @@ const short FREQ_PLACEMENT[][6] = {
 };
 */
 
-
+/*
 // 90-Degree Rotated
 const short FREQ_PLACEMENT[][6] = {
   //          ^
@@ -123,7 +123,31 @@ const short FREQ_PLACEMENT[][6] = {
   {35, 29, 23, 17, 11, 5},
   {36, 30, 24, 18, 12, 6}
 };
+*/
 
+// 90-Degree Rotated (improved)
+// const uint8_t FREQ_PLACEMENT[][6] = {
+//   //          ^
+//   //        Front
+//   {36, 25, 24, 13, 12, 1},
+//   {35, 26, 23, 14, 11, 2},
+//   {34, 27, 22, 15, 10, 3},
+//   {33, 28, 21, 16, 9,  4},
+//   {32, 29, 20, 17, 8,  5},
+//   {31, 30, 19, 18, 7,  6}
+// };
+
+
+const int8_t FREQ_PLACEMENT[][6] = {
+  //          ^
+  //        Front
+  {-6, -5, -4, -3, -2, -1},
+  {-6, -5, -4, -3, -2, -1},
+  {-6, -5, -4, -3, -2, -1},
+  {-6, -5, -4, -3, -2, -1},
+  {-6, -5, -4, -3, -2, -1},
+  {-6, -5, -4, -3, -2, -1}
+};
 
 /*
 // Sprial
