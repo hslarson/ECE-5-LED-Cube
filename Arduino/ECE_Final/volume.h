@@ -66,18 +66,12 @@ void VolumeControl::getVolume() {
 
 void VolumeControl::makeVolumeMatrix() {
     short num_bars = currentVolume;
-    bool break_all = 0;
 
     // Continue lighting rows until num bars = 0
-    for (short col = 5; col >= 0 && !break_all; col--) {
-        for (short layer = 0; layer < 6 && !break_all; layer++) {
-
+    for (short col = 5; col >= 0; col--) {
+        for (short layer = 0; (layer < 6) && (num_bars-- > 0); layer++) {
             for(short row = 0; row < 6; row++) {
                 volumeMatrix[layer][row][col] = true;
-            }
-
-            if (--num_bars <= 0) {
-                break_all = true;
             }
         }
     }
